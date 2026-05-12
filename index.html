@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HemoScan - AI Blood Analytics Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        medical: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                            700: '#be123c',
+                            800: '#9f1239',
+                            900: '#881337',
+                        },
+                        darkBg: '#0f172a',
+                        darkCard: '#1e293b',
+                    },
+                    fontFamily: {
+                        outfit: ['Outfit', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .scanner-line {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #f43f5e, transparent);
+            position: absolute;
+            width: 100%;
+            top: 0;
+            animation: scan 2s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #fb7185 0%, #e11d48 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="min-h-screen overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <div class="w-10 h-10 bg-medical-600 rounded-xl flex items-center justify-center shadow-lg shadow-medical-600/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+            </div>
+            <span class="text-2xl font-bold tracking-tight">Hemo<span class="text-medical-500">Scan</span></span>
+        </div>
+        <div class="hidden md:flex space-x-8 text-sm font-medium">
+            <a href="#" class="hover:text-medical-400 transition">Dashboard</a>
+            <a href="#" class="hover:text-medical-400 transition">Analytics</a>
+            <a href="#" class="hover:text-medical-400 transition">Inventory</a>
+            <a href="#" class="hover:text-medical-400 transition">Settings</a>
+        </div>
+        <button id="themeToggle" class="p-2 rounded-full hover:bg-slate-800 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-28 pb-20 px-6 max-w-7xl mx-auto">
+        
+        <!-- Hero Section -->
+        <div class="grid lg:grid-cols-2 gap-12 items-center mb-20">
+            <div class="space-y-6">
+                <h1 class="text-5xl md:text-6xl font-bold leading-tight">
+                    Advanced <span class="gradient-text">Edge AI</span> for Blood Analysis
+                </h1>
+                <p class="text-slate-400 text-lg max-w-lg">
+                    Real-time spectral analysis and blood type identification using proprietary machine learning models. Secured by AES-256 and powered by IoT.
+                </p>
+                <div class="flex space-x-4">
+                    <button class="bg-medical-600 hover:bg-medical-700 px-8 py-3 rounded-xl font-semibold transition-all shadow-lg shadow-medical-600/40">
+                        Launch Dashboard
+                    </button>
+                    <button class="glass px-8 py-3 rounded-xl font-semibold hover:bg-slate-800 transition-all">
+                        View Documentation
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Interactive Scanner Tool (DOM Manipulation Demo) -->
+            <div class="glass p-8 rounded-3xl relative overflow-hidden group">
+                <div class="scanner-line hidden" id="scannerLine"></div>
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-xl font-semibold">Live AI Scanner</h2>
+                    <span class="flex items-center text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded-full">
+                        <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span> System Ready
+                    </span>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="relative h-48 bg-slate-900/50 rounded-2xl border-2 border-dashed border-slate-700 flex flex-col items-center justify-center transition-all group-hover:border-medical-500/50" id="scanArea">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-slate-500 mb-2 group-hover:text-medical-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                        </svg>
+                        <p class="text-slate-500 text-sm" id="scanStatusText">Insert Sample to Begin Scan</p>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <select id="sampleSelect" class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-medical-500 transition">
+                            <option value="">Select Sample ID...</option>
+                            <option value="SMP-001">SMP-001 (Unknown)</option>
+                            <option value="SMP-002">SMP-002 (Unknown)</option>
+                            <option value="SMP-003">SMP-003 (Unknown)</option>
+                        </select>
+                        <button id="startScan" class="bg-medical-600 hover:bg-medical-700 px-6 py-3 rounded-xl font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            Analyze
+                        </button>
+                    </div>
+
+                    <!-- Results Area (Hidden Initially) -->
+                    <div id="resultContainer" class="hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div class="p-4 bg-medical-500/10 border border-medical-500/20 rounded-xl">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-xs text-medical-300 uppercase font-bold tracking-wider">Analysis Result</p>
+                                    <h3 class="text-3xl font-bold" id="bloodTypeResult">O+ Positive</h3>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xs text-slate-400">Confidence Score</p>
+                                    <p class="text-xl font-mono text-green-400" id="confidenceScore">98.2%</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 h-2 bg-slate-800 rounded-full overflow-hidden">
+                                <div class="h-full bg-medical-500" style="width: 98.2%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Stats -->
+        <div class="grid md:grid-cols-4 gap-6">
+            <div class="glass p-6 rounded-2xl">
+                <p class="text-slate-400 text-sm mb-1">Total Inventory</p>
+                <h3 class="text-2xl font-bold" id="stat-inventory">0</h3>
+                <p class="text-xs text-green-400 mt-2">↑ 12% from yesterday</p>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <p class="text-slate-400 text-sm mb-1">Active Requests</p>
+                <h3 class="text-2xl font-bold" id="stat-requests">0</h3>
+                <p class="text-xs text-amber-400 mt-2">4 Critical Priority</p>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <p class="text-slate-400 text-sm mb-1">Processing Time</p>
+                <h3 class="text-2xl font-bold">1.2s</h3>
+                <p class="text-xs text-slate-500 mt-2">Edge-based Inference</p>
+            </div>
+            <div class="glass p-6 rounded-2xl">
+                <p class="text-slate-400 text-sm mb-1">Network Security</p>
+                <h3 class="text-2xl font-bold text-green-400">AES-256</h3>
+                <p class="text-xs text-slate-500 mt-2">Encrypted Tunnel Active</p>
+            </div>
+        </div>
+
+        <!-- Dynamic List (DOM Manipulation Demo) -->
+        <div class="mt-20">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="text-3xl font-bold">Pending Transfusions</h2>
+                    <p class="text-slate-400">Real-time queue from hospital network</p>
+                </div>
+                <button id="addRequest" class="flex items-center space-x-2 text-sm text-medical-400 hover:text-medical-300 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Add Manual Request</span>
+                </button>
+            </div>
+
+            <div class="glass rounded-3xl overflow-hidden">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-slate-800/50">
+                            <th class="px-6 py-4 font-semibold text-sm">Request ID</th>
+                            <th class="px-6 py-4 font-semibold text-sm">Hospital</th>
+                            <th class="px-6 py-4 font-semibold text-sm">Blood Type</th>
+                            <th class="px-6 py-4 font-semibold text-sm">Priority</th>
+                            <th class="px-6 py-4 font-semibold text-sm">Status</th>
+                            <th class="px-6 py-4 font-semibold text-sm">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requestTableBody">
+                        <!-- Items will be injected by DOM -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- DOM MANIPULATION LOGIC ---
+
+        // 1. Initial State & Data
+        let inventoryCount = 1248;
+        let requestCount = 42;
+        const bloodTypes = ['A+', 'B+', 'O+', 'AB+', 'A-', 'B-', 'O-', 'AB-'];
+        const hospitals = ['RS Bethesda', 'RS Sardjito', 'RS Panti Rapih', 'PMI Kota Yogyakarta'];
+
+        const requestData = [
+            { id: 'REQ-942', hospital: 'RS Bethesda', type: 'A+', priority: 'Urgent', status: 'Pending' },
+            { id: 'REQ-943', hospital: 'RS Sardjito', type: 'O-', priority: 'Critical', status: 'In Transit' },
+            { id: 'REQ-944', hospital: 'RS Panti Rapih', type: 'B+', priority: 'Normal', status: 'Pending' }
+        ];
+
+        // 2. DOM Elements
+        const scanBtn = document.getElementById('startScan');
+        const scanLine = document.getElementById('scannerLine');
+        const scanArea = document.getElementById('scanArea');
+        const scanStatus = document.getElementById('scanStatusText');
+        const resultContainer = document.getElementById('resultContainer');
+        const bloodTypeResult = document.getElementById('bloodTypeResult');
+        const confidenceScore = document.getElementById('confidenceScore');
+        const sampleSelect = document.getElementById('sampleSelect');
+        
+        const tableBody = document.getElementById('requestTableBody');
+        const addBtn = document.getElementById('addRequest');
+        const statInv = document.getElementById('stat-inventory');
+        const statReq = document.getElementById('stat-requests');
+
+        // 3. Functions
+        function renderTable() {
+            tableBody.innerHTML = '';
+            requestData.forEach((req, index) => {
+                const row = document.createElement('tr');
+                row.className = 'border-t border-slate-700/50 hover:bg-slate-800/30 transition';
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-sm font-mono text-slate-400">\${req.id}</td>
+                    <td class="px-6 py-4 text-sm font-medium">\${req.hospital}</td>
+                    <td class="px-6 py-4 text-sm">
+                        <span class="px-2 py-1 bg-medical-500/20 text-medical-400 rounded-md font-bold">\${req.type}</span>
+                    </td>
+                    <td class="px-6 py-4 text-sm">
+                        <span class="px-2 py-1 \${req.priority === 'Critical' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'} rounded-md text-xs font-bold uppercase tracking-wider">
+                            \${req.priority}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm">
+                        <div class="flex items-center">
+                            <span class="w-2 h-2 rounded-full mr-2 \${req.status === 'Pending' ? 'bg-amber-400' : 'bg-blue-400'}"></span>
+                            \${req.status}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm">
+                        <button onclick="removeRequest(\${index})" class="text-slate-500 hover:text-red-400 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            statReq.innerText = requestData.length;
+        }
+
+        window.removeRequest = (index) => {
+            requestData.splice(index, 1);
+            renderTable();
+        };
+
+        function animateNumbers() {
+            let inv = 0;
+            const timer = setInterval(() => {
+                inv += 13;
+                if (inv >= inventoryCount) {
+                    inv = inventoryCount;
+                    clearInterval(timer);
+                }
+                statInv.innerText = inv.toLocaleString();
+            }, 20);
+        }
+
+        // 4. Event Listeners
+        scanBtn.addEventListener('click', () => {
+            if (!sampleSelect.value) {
+                alert('Please select a sample first!');
+                return;
+            }
+
+            // Start animation
+            scanBtn.disabled = true;
+            scanLine.classList.remove('hidden');
+            scanStatus.innerText = 'Analyzing Spectral Data...';
+            scanArea.classList.add('border-medical-500', 'bg-medical-500/5');
+            resultContainer.classList.add('hidden');
+
+            setTimeout(() => {
+                // End animation
+                scanBtn.disabled = false;
+                scanLine.classList.add('hidden');
+                scanStatus.innerText = 'Analysis Complete';
+                scanArea.classList.remove('border-medical-500', 'bg-medical-500/5');
+                
+                // Set random results
+                const randomType = bloodTypes[Math.floor(Math.random() * bloodTypes.length)];
+                const randomConf = (Math.random() * (99.9 - 92.0) + 92.0).toFixed(1);
+                
+                bloodTypeResult.innerText = randomType + ' Positive';
+                confidenceScore.innerText = randomConf + '%';
+                
+                resultContainer.classList.remove('hidden');
+            }, 2500);
+        });
+
+        addBtn.addEventListener('click', () => {
+            const newId = 'REQ-' + Math.floor(Math.random() * 1000);
+            const newType = bloodTypes[Math.floor(Math.random() * bloodTypes.length)];
+            const newHosp = hospitals[Math.floor(Math.random() * hospitals.length)];
+            
+            requestData.unshift({
+                id: newId,
+                hospital: newHosp,
+                type: newType,
+                priority: Math.random() > 0.7 ? 'Critical' : 'Normal',
+                status: 'Pending'
+            });
+            renderTable();
+        });
+
+        // Initialize
+        renderTable();
+        animateNumbers();
+    </script>
+</body>
+</html>
